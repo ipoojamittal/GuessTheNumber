@@ -1,3 +1,4 @@
+// DOM Elements
 const hint = document.getElementById("hint");
 const noOfGuessesRef = document.getElementById("no-of-guesses");
 const guessedNumsRef = document.getElementById("guessed-nums");
@@ -6,15 +7,46 @@ const game = document.getElementById("game");
 const guessInput = document.getElementById("guess");
 const checkButton = document.getElementById("check-btn");
 const revealButton = document.getElementById("reveal-answer");
+const modeSelectionScreen = document.getElementById("mode-selection");
+const singlePlayerBtn = document.getElementById("single-player-btn");
+const twoPlayerBtn = document.getElementById("two-player-btn");
+const currentPlayerDisplay = document.getElementById("current-player");
+const twoPlayerStats = document.getElementById("two-player-stats");
+const player1GuessesRef = document.getElementById("player1-guesses");
+const player1NumbersRef = document.getElementById("player1-numbers");
+const player2GuessesRef = document.getElementById("player2-guesses");
+const player2NumbersRef = document.getElementById("player2-numbers");
+const gameTitle = document.getElementById("game-title");
 
+// Game Variables
 let answer, noOfGuesses, guessedNumsArr;
+let gameMode = null; // 'single' or 'two'
+let currentPlayer = 1; // For two-player mode
+let player1Guesses = 0;
+let player2Guesses = 0;
+let player1GuessedNums = [];
+let player2GuessedNums = [];
+let gameEnded = false;
 
 const play = () => {
+  if (gameEnded) return;
+  
   const userGuess = guessInput.value;
   if (userGuess < 1 || userGuess > 100 || isNaN(userGuess)) {
     alert("Please enter a valid number between 1 and 100.");
     return;
   }
+  
+  guessInput.value = "";
+  
+  if (gameMode === "single") {
+    playSinglePlayer(userGuess);
+  } else if (gameMode === "two") {
+    playTwoPlayer(userGuess);
+  }
+};
+
+const playSinglePlayer = (userGuess) => {
   guessedNumsArr.push(userGuess);
   noOfGuesses += 1;
   if (userGuess != answer) {
@@ -32,23 +64,121 @@ const play = () => {
       hint.classList.add("error");
     }, 10);
   } else {
-    hint.innerHTML = `Congratulations!<br>The number was <span>${answer}</span>.<br>You guessed the number in <span>${noOfGuesses} </span>tries.`;
-    hint.classList.add("success");
-    game.style.display = "none";
-    restartButton.style.display = "block";
+    endSinglePlayerGame();
   }
 };
 
-const init = () => {
-//   console.log("Game Started");
+const playTwoPlayer = (userGuess) => {
+  if (currentPlayer === 1) {
+    player1GuessedNums.push(userGuess);
+    player1Guesses += 1;
+  } else {
+    player2GuessedNums.push(userGuess);
+    player2Guesses += 1;
+  }
+  
+  if (userGuess != answer) {
+    if (userGuess < answer) {
+      hint.innerHTML = `Too low. Try Again!`;
+    } else {
+      hint.innerHTML = `Too high. Try Again!`;
+    }
+    updateTwoPlayerDisplay();
+    hint.classList.remove("error");
+    setTimeout(() => {
+      hint.classList.add("error");
+    }, 10);
+    
+    // Switch player
+    currentPlayer = currentPlayer === 1 ? 2 : 1;
+    currentPlayerDisplay.className = currentPlayer === 1 ? "player-1" : "player-2";
+    currentPlayerDisplay.innerHTML = `Player <span>${currentPlayer}</span>'s Turn`;
+  } else {
+    endTwoPlayerGame(currentPlayer);
+  }
+};
+
+const endSinglePlayerGame = () => {
+  hint.innerHTML = `Congratulations!<br>The number was <span>${answer}</span>.<br>You guessed the number in <span>${noOfGuesses} </span>tries.`;
+  hint.classList.add("success");
+  game.style.display = "none";
+  revealButton.style.display = "none";
+  restartButton.style.display = "block";
+  gameEnded = true;
+};
+
+const endTwoPlayerGame = (winningPlayer) => {
+  let resultMessage = "";
+  
+  if (winningPlayer === 1) {
+    resultMessage = `Player 1 Wins!<br>Player 1 guessed in <span>${player1Guesses}</span> tries.<br>Player 2 took <span>${player2Guesses}</span> tries.`;
+  } else if (winningPlayer === 2) {
+    resultMessage = `Player 2 Wins!<br>Player 2 guessed in <span>${player2Guesses}</span> tries.<br>Player 1 took <span>${player1Guesses}</span> tries.`;
+  }
+  
+  hint.innerHTML = resultMessage;
+  hint.classList.add("success");
+  game.style.display = "none";
+  revealButton.style.display = "none";
+  restartButton.style.display = "block";
+  gameEnded = true;
+};
+
+const updateTwoPlayerDisplay = () => {
+  player1GuessesRef.innerHTML = player1Guesses;
+  player1NumbersRef.innerHTML = player1GuessedNums.join(", ") || "None";
+  player2GuessesRef.innerHTML = player2Guesses;
+  player2NumbersRef.innerHTML = player2GuessedNums.join(", ") || "None";
+};
+
+const startGame = (mode) => {
+  gameMode = mode;
+  gameEnded = false;
   answer = Math.floor(Math.random() * 100) + 1;
-//   console.log(answer);
+  console.log(answer); // For debugging purposes
+  modeSelectionScreen.style.display = "none";
+  game.style.display = "grid";
+  revealButton.style.display = "block";
+  restartButton.style.display = "none";
+  hint.innerHTML = "";
+  hint.classList.remove("success", "error", "warning");
+  
+  if (mode === "single") {
+    initSinglePlayer();
+  } else {
+    initTwoPlayer();
+  }
+};
+
+const initSinglePlayer = () => {
+  gameTitle.innerHTML = `Hey there!<br/>I have chosen a number between 1 - 100.<br />Can you try to guess it?`;
   noOfGuesses = 0;
   guessedNumsArr = [];
   noOfGuessesRef.innerHTML = "No. Of Guesses: 0";
   guessedNumsRef.innerHTML = "Guessed Numbers are: None";
-  guessInput.value = "";
-  hint.classList.remove("success", "error");
+  currentPlayerDisplay.style.display = "none";
+  twoPlayerStats.style.display = "none";
+  guessInput.focus();
+};
+
+const initTwoPlayer = () => {
+  gameTitle.innerHTML = `Two Player Mode<br/>I have chosen a number between 1 - 100.<br />Players will take turns guessing!`;
+  currentPlayer = 1;
+  player1Guesses = 0;
+  player2Guesses = 0;
+  player1GuessedNums = [];
+  player2GuessedNums = [];
+  currentPlayerDisplay.style.display = "block";
+  currentPlayerDisplay.className = "player-1";
+  currentPlayerDisplay.innerHTML = `Player <span>1</span>'s Turn`;
+  twoPlayerStats.style.display = "block";
+  player1GuessesRef.innerHTML = "0";
+  player1NumbersRef.innerHTML = "None";
+  player2GuessesRef.innerHTML = "0";
+  player2NumbersRef.innerHTML = "None";
+  noOfGuessesRef.innerHTML = "No. Of Guesses: 0";
+  guessedNumsRef.innerHTML = "Guessed Numbers are: None";
+  guessInput.focus();
 };
 
 guessInput.addEventListener("keydown", (event) => {
@@ -58,12 +188,22 @@ guessInput.addEventListener("keydown", (event) => {
   }
 });
 
+singlePlayerBtn.addEventListener("click", () => {
+  startGame("single");
+});
+
+twoPlayerBtn.addEventListener("click", () => {
+  startGame("two");
+});
+
 restartButton.addEventListener("click", () => {
-  game.style.display = "grid";
+  modeSelectionScreen.style.display = "flex";
+  game.style.display = "none";
+  revealButton.style.display = "none";
   restartButton.style.display = "block";
-  hint.innerHTML = "Page refreshed. Start guessing!";
-  hint.classList.remove("success");
-  init();
+  hint.innerHTML = "";
+  hint.classList.remove("success", "error", "warning");
+  gameEnded = false;
 });
 
 checkButton.addEventListener("click", play);
@@ -73,7 +213,13 @@ revealButton.addEventListener("click", () => {
   hint.classList.add("warning");
   game.style.display = "none";
   revealButton.style.display = "none";
-  restartButton.style.display = "block";
+  restartButton.style.display = "none";
+  gameEnded = true;
 });
 
-window.addEventListener("load", init);
+window.addEventListener("load", () => {
+  modeSelectionScreen.style.display = "flex";
+  game.style.display = "none";
+  revealButton.style.display = "none";
+  restartButton.style.display = "none";
+});
