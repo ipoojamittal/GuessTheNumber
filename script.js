@@ -3,6 +3,7 @@ const hint = document.getElementById("hint");
 const noOfGuessesRef = document.getElementById("no-of-guesses");
 const guessedNumsRef = document.getElementById("guessed-nums");
 const restartButton = document.getElementById("restart");
+const backButton = document.getElementById("back-btn");
 const game = document.getElementById("game");
 const guessInput = document.getElementById("guess");
 const checkButton = document.getElementById("check-btn");
@@ -27,6 +28,7 @@ let player2Guesses = 0;
 let player1GuessedNums = [];
 let player2GuessedNums = [];
 let gameEnded = false;
+let hasGuessed = false; // Track if at least one guess has been made
 
 const play = () => {
   if (gameEnded) return;
@@ -49,6 +51,8 @@ const play = () => {
 const playSinglePlayer = (userGuess) => {
   guessedNumsArr.push(userGuess);
   noOfGuesses += 1;
+  hasGuessed = true;
+  restartButton.style.display = "block";
   if (userGuess != answer) {
     if (userGuess < answer) {
       hint.innerHTML = "Too low. Try Again!";
@@ -77,6 +81,9 @@ const playTwoPlayer = (userGuess) => {
     player2Guesses += 1;
   }
   
+  hasGuessed = true;
+  restartButton.style.display = "block";
+  
   if (userGuess != answer) {
     if (userGuess < answer) {
       hint.innerHTML = `Too low. Try Again!`;
@@ -103,6 +110,7 @@ const endSinglePlayerGame = () => {
   hint.classList.add("success");
   game.style.display = "none";
   revealButton.style.display = "none";
+  backButton.style.display = "none";
   restartButton.style.display = "block";
   gameEnded = true;
 };
@@ -120,6 +128,7 @@ const endTwoPlayerGame = (winningPlayer) => {
   hint.classList.add("success");
   game.style.display = "none";
   revealButton.style.display = "none";
+  backButton.style.display = "none";
   restartButton.style.display = "block";
   gameEnded = true;
 };
@@ -134,11 +143,13 @@ const updateTwoPlayerDisplay = () => {
 const startGame = (mode) => {
   gameMode = mode;
   gameEnded = false;
+  hasGuessed = false;
   answer = Math.floor(Math.random() * 100) + 1;
   console.log(answer); // For debugging purposes
   modeSelectionScreen.style.display = "none";
   game.style.display = "grid";
   revealButton.style.display = "block";
+  backButton.style.display = "block";
   restartButton.style.display = "none";
   hint.innerHTML = "";
   hint.classList.remove("success", "error", "warning");
@@ -200,10 +211,24 @@ restartButton.addEventListener("click", () => {
   modeSelectionScreen.style.display = "flex";
   game.style.display = "none";
   revealButton.style.display = "none";
-  restartButton.style.display = "block";
+  restartButton.style.display = "none";
+  backButton.style.display = "none";
   hint.innerHTML = "";
   hint.classList.remove("success", "error", "warning");
   gameEnded = false;
+  hasGuessed = false;
+});
+
+backButton.addEventListener("click", () => {
+  modeSelectionScreen.style.display = "flex";
+  game.style.display = "none";
+  revealButton.style.display = "none";
+  restartButton.style.display = "none";
+  backButton.style.display = "none";
+  hint.innerHTML = "";
+  hint.classList.remove("success", "error", "warning");
+  gameEnded = false;
+  hasGuessed = false;
 });
 
 checkButton.addEventListener("click", play);
@@ -213,7 +238,8 @@ revealButton.addEventListener("click", () => {
   hint.classList.add("warning");
   game.style.display = "none";
   revealButton.style.display = "none";
-  restartButton.style.display = "none";
+  backButton.style.display = "none";
+  restartButton.style.display = "block";
   gameEnded = true;
 });
 
@@ -222,4 +248,5 @@ window.addEventListener("load", () => {
   game.style.display = "none";
   revealButton.style.display = "none";
   restartButton.style.display = "none";
+  backButton.style.display = "none";
 });
