@@ -156,7 +156,6 @@ NumGuess/
 ├── privacy.html     # Privacy Policy page
 ├── notice.html      # Terms & Legal Notice page
 ├── README.md        # Project documentation
-└── DEPLOYMENT.md    # Deployment guide
 ```
 
 ---
@@ -185,7 +184,7 @@ NumGuess/
 
 ### Footer & Credits
 Every page includes a professional footer with:
-- **Copyright Notice**: © 2024 NumGuess
+- **Copyright Notice**: © 2026 NumGuess
 - **Creator Credit**: Created by **@pooja**
 - **Legal Links**: Quick access to Privacy Policy and Terms
 - **External Links**: GitHub repository link
@@ -208,20 +207,6 @@ Visit [`notice.html`](notice.html) for complete legal terms including:
 - Browser compatibility
 - Data storage practices
 
-### Deployment Guide
-See [`DEPLOYMENT.md`](DEPLOYMENT.md) for complete deployment instructions:
-- **GitHub Pages** (Recommended - Free)
-- **Netlify** (User-friendly)
-- **Vercel** (Professional)
-- **Traditional Web Hosting**
-- Security considerations
-- Performance optimization
-- Post-deployment verification
-- Troubleshooting guide
-
-**Quick Deploy:**
-1. Push to GitHub → Enable Pages → Done ✅
-2. Or connect to Netlify → Auto-deploy → Done ✅
 
 ---
 
