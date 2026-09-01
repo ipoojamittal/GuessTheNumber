@@ -174,9 +174,9 @@ const endTwoPlayerGame = (winningPlayer) => {
 const endGameNoGuessesLeft = () => {
   let resultMessage = "";
   if (gameMode === "single") {
-    resultMessage = `❌ Game Over!<br>You ran out of guesses.<br>The correct answer was <span>${answer}</span>.<br>You made <span>${noOfGuesses}</span> guesses.`;
+    resultMessage = `Game Over!<br>You ran out of guesses.<br>The correct answer was <span>${answer}</span>.<br>You made <span>${noOfGuesses}</span> guesses.`;
   } else {
-    resultMessage = `❌ Game Over!<br>Both players ran out of guesses.<br>The correct answer was <span>${answer}</span>.<br>Player 1: ${player1Guesses} guesses | Player 2: ${player2Guesses} guesses`;
+    resultMessage = `Game Over!<br>Both players ran out of guesses.<br>The correct answer was <span>${answer}</span>.<br>Player 1: ${player1Guesses} guesses | Player 2: ${player2Guesses} guesses`;
   }
   
   hint.innerHTML = resultMessage;
@@ -202,7 +202,7 @@ const startGame = (mode) => {
   gameEnded = false;
   hasGuessed = false;
   answer = Math.floor(Math.random() * 100) + 1;
-  console.log(answer); // For debugging purposes
+//   console.log(answer); // For debugging purposes
   modeSelectionScreen.style.display = "none";
   game.style.display = "grid";
   revealButton.style.display = "block";
