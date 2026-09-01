@@ -5,6 +5,7 @@ const restartButton = document.getElementById("restart");
 const game = document.getElementById("game");
 const guessInput = document.getElementById("guess");
 const checkButton = document.getElementById("check-btn");
+const revealButton = document.getElementById("reveal-answer");
 
 let answer, noOfGuesses, guessedNumsArr;
 
@@ -39,9 +40,9 @@ const play = () => {
 };
 
 const init = () => {
-  console.log("Game Started");
+//   console.log("Game Started");
   answer = Math.floor(Math.random() * 100) + 1;
-  console.log(answer);
+//   console.log(answer);
   noOfGuesses = 0;
   guessedNumsArr = [];
   noOfGuessesRef.innerHTML = "No. Of Guesses: 0";
@@ -59,11 +60,20 @@ guessInput.addEventListener("keydown", (event) => {
 
 restartButton.addEventListener("click", () => {
   game.style.display = "grid";
-  restartButton.style.display = "none";
-  hint.innerHTML = "";
+  restartButton.style.display = "block";
+  hint.innerHTML = "Page refreshed. Start guessing!";
   hint.classList.remove("success");
   init();
 });
 
 checkButton.addEventListener("click", play);
+
+revealButton.addEventListener("click", () => {
+  hint.innerHTML = `The correct answer was <span>${answer}</span>!<br>Game Over. Please restart!`;
+  hint.classList.add("warning");
+  game.style.display = "none";
+  revealButton.style.display = "none";
+  restartButton.style.display = "block";
+});
+
 window.addEventListener("load", init);
