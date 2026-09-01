@@ -29,9 +29,30 @@ let player1GuessedNums = [];
 let player2GuessedNums = [];
 let gameEnded = false;
 let hasGuessed = false; // Track if at least one guess has been made
+let maxGuesses = 12; // Single player has 12 guesses
+let maxGuessesPerPlayer = 6; // Two player has 6 guesses each
+let remainingGuesses = 12; // Track remaining guesses for current player
 
 const play = () => {
   if (gameEnded) return;
+  
+  // Check if guess limit reached
+  if (gameMode === "single" && remainingGuesses <= 0) {
+    alert("You've used all your guesses! Game Over.");
+    endGameNoGuessesLeft();
+    return;
+  }
+  
+  if (gameMode === "two") {
+    const playerRemaining = currentPlayer === 1 
+      ? (maxGuessesPerPlayer - player1Guesses) 
+      : (maxGuessesPerPlayer - player2Guesses);
+    if (playerRemaining <= 0) {
+      alert(`Player ${currentPlayer} has used all their guesses!`);
+      endGameNoGuessesLeft();
+      return;
+    }
+  }
   
   const userGuess = guessInput.value;
   if (userGuess < 1 || userGuess > 100 || isNaN(userGuess)) {
@@ -51,6 +72,7 @@ const play = () => {
 const playSinglePlayer = (userGuess) => {
   guessedNumsArr.push(userGuess);
   noOfGuesses += 1;
+  remainingGuesses -= 1;
   hasGuessed = true;
   restartButton.style.display = "block";
   if (userGuess != answer) {
@@ -59,7 +81,7 @@ const playSinglePlayer = (userGuess) => {
     } else {
       hint.innerHTML = "Too high. Try Again!";
     }
-    noOfGuessesRef.innerHTML = `<span>No. Of Guesses:</span> ${noOfGuesses}`;
+    noOfGuessesRef.innerHTML = `<span>No. Of Guesses:</span> ${noOfGuesses} | <span style="color: #d72222; font-weight: 600;">Remaining: ${remainingGuesses}</span>`;
     guessedNumsRef.innerHTML = `<span>Guessed Numbers are: </span>${guessedNumsArr.join(
       ","
     )}`;
@@ -67,6 +89,13 @@ const playSinglePlayer = (userGuess) => {
     setTimeout(() => {
       hint.classList.add("error");
     }, 10);
+    
+    // Check if guesses exhausted
+    if (remainingGuesses <= 0) {
+      setTimeout(() => {
+        endGameNoGuessesLeft();
+      }, 1000);
+    }
   } else {
     endSinglePlayerGame();
   }
@@ -96,10 +125,19 @@ const playTwoPlayer = (userGuess) => {
       hint.classList.add("error");
     }, 10);
     
+    // Check if current player exhausted their guesses
+    if ((currentPlayer === 1 && player1Guesses >= maxGuessesPerPlayer) ||
+        (currentPlayer === 2 && player2Guesses >= maxGuessesPerPlayer)) {
+      setTimeout(() => {
+        endGameNoGuessesLeft();
+      }, 1000);
+      return;
+    }
+    
     // Switch player
     currentPlayer = currentPlayer === 1 ? 2 : 1;
     currentPlayerDisplay.className = currentPlayer === 1 ? "player-1" : "player-2";
-    currentPlayerDisplay.innerHTML = `Player <span>${currentPlayer}</span>'s Turn`;
+    currentPlayerDisplay.innerHTML = `🎯 Player <span>${currentPlayer}</span>'s Turn`;
   } else {
     endTwoPlayerGame(currentPlayer);
   }
@@ -133,10 +171,29 @@ const endTwoPlayerGame = (winningPlayer) => {
   gameEnded = true;
 };
 
+const endGameNoGuessesLeft = () => {
+  let resultMessage = "";
+  if (gameMode === "single") {
+    resultMessage = `❌ Game Over!<br>You ran out of guesses.<br>The correct answer was <span>${answer}</span>.<br>You made <span>${noOfGuesses}</span> guesses.`;
+  } else {
+    resultMessage = `❌ Game Over!<br>Both players ran out of guesses.<br>The correct answer was <span>${answer}</span>.<br>Player 1: ${player1Guesses} guesses | Player 2: ${player2Guesses} guesses`;
+  }
+  
+  hint.innerHTML = resultMessage;
+  hint.classList.add("error");
+  game.style.display = "none";
+  revealButton.style.display = "none";
+  backButton.style.display = "none";
+  restartButton.style.display = "block";
+  gameEnded = true;
+};
+
 const updateTwoPlayerDisplay = () => {
-  player1GuessesRef.innerHTML = player1Guesses;
+  const p1Remaining = maxGuessesPerPlayer - player1Guesses;
+  const p2Remaining = maxGuessesPerPlayer - player2Guesses;
+  player1GuessesRef.innerHTML = `${player1Guesses}/${maxGuessesPerPlayer} (${p1Remaining} left)`;
   player1NumbersRef.innerHTML = player1GuessedNums.join(", ") || "None";
-  player2GuessesRef.innerHTML = player2Guesses;
+  player2GuessesRef.innerHTML = `${player2Guesses}/${maxGuessesPerPlayer} (${p2Remaining} left)`;
   player2NumbersRef.innerHTML = player2GuessedNums.join(", ") || "None";
 };
 
@@ -162,10 +219,11 @@ const startGame = (mode) => {
 };
 
 const initSinglePlayer = () => {
-  gameTitle.innerHTML = `Hey there!<br/>I have chosen a number between 1 - 100.<br />Can you try to guess it?`;
+  gameTitle.innerHTML = `Hey there!<br/>I have chosen a number between 1 - 100.<br />Can you try to guess it? (12 guesses max)`;
   noOfGuesses = 0;
+  remainingGuesses = maxGuesses;
   guessedNumsArr = [];
-  noOfGuessesRef.innerHTML = "No. Of Guesses: 0";
+  noOfGuessesRef.innerHTML = `<span>No. Of Guesses:</span> 0 | <span style="color: #d72222; font-weight: 600;">Remaining: ${remainingGuesses}</span>`;
   guessedNumsRef.innerHTML = "Guessed Numbers are: None";
   currentPlayerDisplay.style.display = "none";
   twoPlayerStats.style.display = "none";
@@ -173,7 +231,7 @@ const initSinglePlayer = () => {
 };
 
 const initTwoPlayer = () => {
-  gameTitle.innerHTML = `Two Player Mode<br/>I have chosen a number between 1 - 100.<br />Players will take turns guessing!`;
+  gameTitle.innerHTML = `Two Player Mode<br/>I have chosen a number between 1 - 100.<br />Players will take turns guessing! (6 guesses each)`;
   currentPlayer = 1;
   player1Guesses = 0;
   player2Guesses = 0;
@@ -181,11 +239,11 @@ const initTwoPlayer = () => {
   player2GuessedNums = [];
   currentPlayerDisplay.style.display = "block";
   currentPlayerDisplay.className = "player-1";
-  currentPlayerDisplay.innerHTML = `Player <span>1</span>'s Turn`;
+  currentPlayerDisplay.innerHTML = `🎯 Player <span>1</span>'s Turn`;
   twoPlayerStats.style.display = "block";
-  player1GuessesRef.innerHTML = "0";
+  player1GuessesRef.innerHTML = `0/${maxGuessesPerPlayer} (${maxGuessesPerPlayer} left)`;
   player1NumbersRef.innerHTML = "None";
-  player2GuessesRef.innerHTML = "0";
+  player2GuessesRef.innerHTML = `0/${maxGuessesPerPlayer} (${maxGuessesPerPlayer} left)`;
   player2NumbersRef.innerHTML = "None";
   noOfGuessesRef.innerHTML = "No. Of Guesses: 0";
   guessedNumsRef.innerHTML = "Guessed Numbers are: None";

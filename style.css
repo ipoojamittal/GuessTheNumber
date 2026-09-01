@@ -6,18 +6,21 @@
 }
 body {
   background-color: #5333c4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 5em;
 }
 .container {
-  width: min(90%, 31.25em);
-  position: absolute;
-  transform: translate(-50%, -50%);
-  top: 50%;
-  left: 50%;
+  width: min(90%, 50em);
   background-color: #ffffff;
-  padding: 4em 2em;
+  padding: 3em 2em;
   border-radius: 0.5em;
   box-shadow: -1.5em -1.5em 20px 20px #202020;
   text-align: center;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 /* Mode Selection Screen */
 .mode-screen {
@@ -202,6 +205,7 @@ h3 {
   font-weight: 500;
   line-height: 2em;
   color: #303030;
+  margin-bottom: 1em;
 }
 .input-wrapper {
   width: 70%;
@@ -271,7 +275,8 @@ button {
   opacity: 1;
 }
 .result {
-  margin-top: 1em;
+  margin-top: 1.5em;
+  min-height: 3em;
 }
 p {
   font-size: 1em;
@@ -281,11 +286,12 @@ p {
 }
 .error,
 .success {
-  padding: 0.5em 0;
+  padding: 1em;
   border-radius: 0.3em;
   margin-bottom: 1em;
   animation: pop 0.4s forwards;
   transform: scale(0);
+  min-height: auto;
 }
 .error {
   background-color: #ffcbcb;
